@@ -1,0 +1,742 @@
+{
+    "n_iter": {
+        "type": "int",
+        "description":"Number of iterations refers to the total number of times the hyperparameter search algorithm explores and evaluates different combinations of parameters.    "
+    },
+    "parameter_search": {
+        "type": "string",
+        "values": [
+            "BayesianOptimization",
+            "RandomSearch"
+        ],
+        "description":"Hyperparameter search, also known as tuning, is the process of optimizing the configuration settings of a machine learning model to enhance its performance."
+    },
+    "folds_number":{
+        "type": "int/none",
+        "possible_values": [
+            "int",
+            "string"
+        ],
+        "strings_values": [
+            "None"
+        ],
+        "description":"CV folds number represent the number of subsets in which the training data is divided during hyperparameter search. If specified as None, it defaults to 3-fold cross-validation. If specified as an integer, it uses StratifiedKFold for more robust evaluation."
+    },
+    "models": [
+        {
+            "id": 1,
+            "model_name": "logistic regression",
+            "task": "classification",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html",
+            "params": {
+                "C": {
+                    "type": "floats array",
+                    "description":"Inverse of regularization strength; must be a positive float. Like in support vector machines, smaller values specify stronger regularization."
+                },
+                "tol": {
+                    "type": "floats array",
+                    "description":"Tolerance for stopping criteria."
+                },
+                "solver": {
+                    "type": "strings array",
+                    "values": [
+                        "lbfgs",
+                        "liblinear",
+                        "newton-cg",
+                        "newton-cholesky",
+                        "sag",
+                        "saga"
+                    ],
+                "description":"Algorithm to use in the optimization problem. Default is ‘lbfgs’. To choose a solver, you might want to consider the following aspects:\n\nFor small datasets, ‘liblinear’ is a good choice, whereas ‘sag’ and ‘saga’ are faster for large ones;\n\nFor multiclass problems, only ‘newton-cg’, ‘sag’, ‘saga’ and ‘lbfgs’ handle multinomial loss;\n\n‘liblinear’ is limited to one-versus-rest schemes.\n\n‘newton-cholesky’ is a good choice for n_samples >> n_features, especially with one-hot encoded categorical features with rare categories. Note that it is limited to binary classification and the one-versus-rest reduction for multiclass classification. Be aware that the memory usage of this solver has a quadratic dependency on n_features because it explicitly computes the Hessian matrix.\n\nWarning The choice of the algorithm depends on the penalty chosen. Supported penalties by solver:\n\n‘lbfgs’ - [‘l2’, None]\n\n‘liblinear’ - [‘l1’, ‘l2’]\n\n‘newton-cg’ - [‘l2’, None]\n\n‘newton-cholesky’ - [‘l2’, None]\n\n‘sag’ - [‘l2’, None]\n\n‘saga’ - [‘elasticnet’, ‘l1’, ‘l2’, None]"
+                },
+                "penalty": {
+                    "type": "strings array",
+                    "values": [
+                        "l1",
+                        "l2",
+                        "elasticnet",
+                        "None"
+                    ],
+                    "description":"The penalty parameter for logistic regression allows you to specify the norm of the penalty. There are four options available:\n\nNone: This option does not add any penalty.\n'l2': This option adds an L2 penalty term and is the default choice.\n'l1': This option adds an L1 penalty term.\n'elasticnet': This option adds both L1 and L2 penalty terms.\n\nIt's important to note that certain penalties may not be compatible with certain solvers. To understand the compatibility between the penalty and solver, please refer to the parameter 'solver' below.\n\nA notable update in version 0.19 is the addition of the l1 penalty with the SAGA solver, which allows for 'multinomial' + L1."
+                },
+                "multi_class": {
+                    "type": "strings array",
+                    "values": [
+                        "auto",
+                        "ovr",
+                        "multinomial"
+                    ],
+                    "description":"If the option chosen is ‘ovr’, then a binary problem is fit for each label. For ‘multinomial’ the loss minimised is the multinomial loss fit across the entire probability distribution, even when the data is binary. ‘multinomial’ is unavailable when solver=’liblinear’. ‘auto’ selects ‘ovr’ if the data is binary, or if solver=’liblinear’, and otherwise selects ‘multinomial’."
+                    
+                },
+                "class_weight": {
+                    "type": "strings array",
+                    "values": [
+                        "None",
+                        "balanced"
+                    ],
+                    "description":"Weights associated with classes in the form {class_label: weight}. If not given, all classes are supposed to have weight one. The “balanced” mode uses the values of y to automatically adjust weights inversely proportional to class frequencies in the input data as n_samples / (n_classes * np.bincount(y)). Note that these weights will be multiplied with sample_weight (passed through the fit method) if sample_weight is specified."
+                },
+                "random_state": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"Used when solver == ‘sag’, ‘saga’ or ‘liblinear’ to shuffle the data"
+                },
+                "fit_intercept": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"Specifies if a constant (a.k.a. bias or intercept) should be added to the decision function."
+                }
+            }
+        },
+        {
+            "id": 2,
+            "model_name": "naive Bayes",
+            "task": "classification",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.GaussianNB.html#sklearn.naive_bayes.GaussianNB",
+            "params": {
+                "var_smoothing": {
+                    "type": "floats array",
+                    "description":"Portion of the largest variance of all features that is added to variances for calculation stability."
+                }
+            }
+        },
+        {
+            "id": 3,
+            "model_name": "decision trees",
+            "task": "classification",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.tree.ExtraTreeClassifier.html",
+            "params": {
+                "splitter": {
+                    "type": "strings array",
+                    "values": [
+                        "random",
+                        "best"
+                    ],
+                    "description":"The strategy used to choose the split at each node. Supported strategies are “best” to choose the best split and “random” to choose the best random split."
+                },
+                "criterion": {
+                    "type": "strings array",
+                    "values": [
+                        "gini",
+                        "entropy",
+                        "log_loss"
+                    ],
+                    "description":"The function to measure the quality of a split. Supported criteria are “gini” for the Gini impurity and “log_loss” and “entropy” both for the Shannon information gain"
+                },
+                "max_depth": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples."
+
+                },
+                "max_features": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "auto",
+                        "sqrt",
+                        "log2"
+                    ],
+                    "description":"The number of features to consider when looking for the best split:\n\nIf int, then consider max_features features at each split.\n\nIf float, then max_features is a fraction, and max(1, int(max_features * n_features_in_)) features are considered at each split.\n\nIf “auto”, then max_features=sqrt(n_features).\n\nIf “sqrt”, then max_features=sqrt(n_features).\n\nIf “log2”, then max_features=log2(n_features).\n\nIf None, then max_features=n_features.\nNote: the search for a split does not stop until at least one valid partition of the node samples is found, even if it requires effective inspection of more than max_features features."
+                },
+                "min_samples_leaf": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float"
+                    ],
+                    "description":"The minimum number of samples required to be at a leaf node. A split point at any depth will only be considered if it leaves at least min_samples_leaf training samples in each of the left and right branches. This may have the effect of smoothing the model, especially in regression. If int, then consider min_samples_leaf as the minimum number. If float, then min_samples_leaf is a fraction, and ceil(min_samples_leaf * n_samples) is the minimum number of samples for each node."
+                },
+                "min_samples_split": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float"
+                    ],
+                    "description":"The minimum number of samples required to split an internal node:\n\nIf int, then consider min_samples_split as the minimum number.\n\nIf float, then min_samples_split is a fraction and ceil(min_samples_split * n_samples) are the minimum number of samples for each split."
+                },
+                "random_state": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":" Controls 3 sources of randomness:\n the bootstrapping of the samples used when building trees (if bootstrap=True)\n the sampling of the features to consider when looking for the best split at each node (if max_features < n_features)\n the draw of the splits for each of the max_features"
+                }
+            }
+        },
+        {
+            "id": 4,
+            "model_name": "SVM",
+            "task": "classification",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html",
+            "params": {
+                "C": {
+                    "type": "floats array",
+                    "description":"Regularization parameter. The strength of the regularization is inversely proportional to C. Must be strictly positive. The penalty is a squared l2 penalty."
+                },
+                "gamma": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "float",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "auto",
+                        "scale"
+                    ],
+                    "description":"Kernel coefficient for 'rbf', 'poly', and 'sigmoid'. If gamma='scale' (default) is passed, then it uses 1 / (n_features * X.var()) as the value of gamma. If 'auto', it uses 1 / n_features. If a float value is provided, it must be non-negative."
+                },
+                "kernel": {
+                    "type": "strings array",
+                    "values": [
+                        "linear",
+                        "poly",
+                        "rbf",
+                        "sigmoid",
+                        "precomputed"
+                    ],
+                    "description":"Specifies the kernel type to be used in the algorithm. If none is given, ‘rbf’ will be used. If a callable is given it is used to pre-compute the kernel matrix from data matrices; that matrix should be an array of shape (n_samples, n_samples)."
+                },
+                "max_iter": {
+                    "type": "ints array",
+                    "description":"Hard limit on iterations within solver, or -1 for no limit."
+                },
+                "probability": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"Controls the pseudo random number generation for shuffling the data for probability estimates. Ignored when probability is False. Pass an int for reproducible output across multiple function calls."
+                },
+                "class_weight": {
+                    "type": "strings array",
+                    "values": [
+                        "None",
+                        "balanced"
+                    ],
+                    "description":"Set the parameter C of class i to class_weight[i]*C for SVC. If not given, all classes are supposed to have weight one. The “balanced” mode uses the values of y to automatically adjust weights inversely proportional to class frequencies in the input data as n_samples / (n_classes * np.bincount(y))."
+                }
+            }
+        },
+        {
+            "id": 5,
+            "model_name": "Linear regression",
+            "task": "regression",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html",
+            "params": {
+                "copy_X": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"If True, X will be copied; else, it may be overwritten."
+                },
+                "positive": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"When set to True, forces the coefficients to be positive. This option is only supported for dense arrays."
+                },
+                "fit_intercept": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"Whether to calculate the intercept for this model. If set to False, no intercept will be used in calculations (i.e. data is expected to be centered)."
+                }
+            }
+        },
+        {
+            "id": 6,
+            "model_name": "Xgboost",
+            "task": "classification",
+            "sklearn_link":"https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.XGBClassifier",
+            "params": {
+                "gamma": {
+                    "type": "floats array",
+                    "description":"(min_split_loss) Minimum loss reduction required to make a further partition on a leaf node of the tree."
+                },
+                "max_depth": {
+                    "type": "ints array",
+                    "description":" Maximum tree depth for base learners."
+                },
+                "subsample": {
+                    "type": "floats array",
+                    "description":"Subsample ratio of the training instance."
+                },
+                "max_leaves": {
+                    "type": "ints array",
+                    "description":"Maximum number of leaves; 0 indicates no limit."
+                },
+                "tree_method": {
+                    "type": "strings array",
+                    "values": [
+                        "auto",
+                        "exact",
+                        "approx",
+                        "hist"
+                    ],
+                    "description":"Specify which tree method to use. Default to auto. If this parameter is set to default, XGBoost will choose the most conservative option available."
+                },
+                "n_estimators": {
+                    "type": "ints array",
+                    "description":"Number of gradient boosted trees. Equivalent to number of boosting rounds."
+                },
+                "learning_rate": {
+                    "type": "floats array",
+                    "description":"Boosting learning rate (xgb’s “eta”)"
+                },
+                "min_child_weight": {
+                    "type": "floats array",
+                    "description":"Minimum sum of instance weight(hessian) needed in a child."
+                }
+            }
+        },
+        {
+            "id": 7,
+            "model_name": "Xgboost",
+            "task": "regression",
+            "sklearn_link":"https://xgboost.readthedocs.io/en/stable/python/python_api.html#xgboost.XGBRegressor",
+            "params": {
+                "gamma": {
+                    "type": "floats array",
+                    "description":"(min_split_loss) Minimum loss reduction required to make a further partition on a leaf node of the tree."
+                },
+                "max_depth": {
+                    "type": "ints array",
+                    "description":"Maximum tree depth for base learners."
+                },
+                "reg_alpha": {
+                    "type": "floats array",
+                    "description":"L1 regularization term on weights (xgb’s alpha)."
+                },
+                "subsample": {
+                    "type": "floats array",
+                    "description":"Subsample ratio of the training instance."
+                },
+                "reg_lambda": {
+                    "type": "floats array",
+                    "description":"L2 regularization term on weights (xgb’s lambda)."
+                },
+                "n_estimators": {
+                    "type": "ints array",
+                    "description":"Number of gradient boosted trees. Equivalent to number of boosting rounds."
+                },
+                "learning_rate": {
+                    "type": "floats array",
+                    "description":"Boosting learning rate (xgb’s “eta”)"
+                },
+                "colsample_bytree": {
+                    "type": "floats array",
+                    "description":"Subsample ratio of columns when constructing each tree."
+                },
+                "min_child_weight": {
+                    "type": "floats array",
+                    "description":"Minimum sum of instance weight(hessian) needed in a child."
+                },
+                "random_state":{
+                    "type": "ints array",
+                    "description":"Random number seed."
+                }
+            }
+        },
+        {
+            "id": 8,
+            "model_name": "K-means",
+            "task": "clustering",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html",
+            "params": {
+                "init": {
+                    "type": "strings array",
+                    "values": [
+                        "k-means++",
+                        "random"
+                    ],
+                    "description":"Method for initialization:\n\n‘k-means++’: selects initial cluster centroids using sampling based on an empirical probability distribution of the points’ contribution to the overall inertia. This technique speeds up convergence. The algorithm implemented is “greedy k-means++”. It differs from the vanilla k-means++ by making several trials at each sampling step and choosing the best centroid among them.\n\n‘random’: choose n_clusters observations (rows) at random from data for the initial centroids.\n\nIf an array is passed, it should be of shape (n_clusters, n_features) and gives the initial centers.\n\nIf a callable is passed, it should take arguments X, n_clusters, and a random state and return an initialization."
+                },
+                "n_init": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "auto"
+                    ],
+                    "description":"Number of times the k-means algorithm is run with different centroid seeds. The final result is the best output of n_init consecutive runs in terms of inertia. Several runs are recommended for sparse high-dimensional problems (see Clustering sparse data with k-means). When n_init='auto', the number of runs depends on the value of init: 10 if using init='random', 1 if using init='k-means++'."
+                },
+                "n_clusters": {
+                    "type": "ints array",
+                    "description":"The number of clusters to form as well as the number of centroids to generate."
+                }
+            }
+        },
+        {
+            "id": 9,
+            "model_name": "Random Forest Classifier",
+            "task": "classification",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html",
+            "params": {
+                "bootstrap": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"Whether bootstrap samples are used when building trees. If False, the whole dataset is used to build each tree."
+                },
+                "criterion": {
+                    "type": "strings array",
+                    "values": [
+                        "gini",
+                        "entropy",
+                        "log_loss"
+                    ],
+                    "description":"The function to measure the quality of a split. Supported criteria are “gini” for the Gini impurity and “log_loss” and “entropy” both for the Shannon information gain. Note: This parameter is tree-specific."
+                },
+                "max_depth": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples."
+                },
+                "max_features": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "sqrt",
+                        "log2",
+                        "None"
+                    ],
+                    "description":"The number of features to consider when looking for the best split:\n\nIf int, then consider max_features features at each split.\n\nIf float, then max_features is a fraction, and max(1, int(max_features * n_features_in_)) features are considered at each split.\n\nIf “auto”, then max_features=sqrt(n_features).\n\nIf “sqrt”, then max_features=sqrt(n_features).\n\nIf “log2”, then max_features=log2(n_features).\n\nIf None, then max_features=n_features.\n\nNote: the search for a split does not stop until at least one valid partition of the node samples is found, even if it requires effective inspection of more than max_features features."
+                },
+                "n_estimators": {
+                    "type": "ints array",
+                    "description":"The number of trees in the forest."
+                },
+                "min_samples_split": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float"
+                    ],
+                    "description":"The minimum number of samples required to split an internal node:\n\nIf int, then consider min_samples_split as the minimum number.\n\nIf float, then min_samples_split is a fraction, and ceil(min_samples_split * n_samples) is the minimum number of samples for each split."
+                },
+                "random_state": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"Controls both the randomness of the bootstrapping of the samples used when building trees (if bootstrap=True) and the sampling of the features to consider when looking for the best split at each node (if max_features < n_features)."
+                }
+            }
+        },
+        {
+            "id": 10,
+            "model_name": "Random Forest Regression",
+            "task": "regression",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html",
+            "params": {
+                "bootstrap": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"Whether bootstrap samples are used when building trees. If False, the whole dataset is used to build each tree."
+                },
+                "criterion": {
+                    "type": "strings array",
+                    "values": [
+                        "squared_error",
+                        "absolute_error",
+                        "friedman_mse",
+                        "poisson"
+                    ],
+                    "description":"The function to measure the quality of a split. Supported criteria are “squared_error” for the mean squared error, which is equal to variance reduction as feature selection criterion and minimizes the L2 loss using the mean of each terminal node, “friedman_mse”, which uses mean squared error with Friedman’s improvement score for potential splits, “absolute_error” for the mean absolute error, which minimizes the L1 loss using the median of each terminal node, and “poisson” which uses reduction in Poisson deviance to find splits. Training using “absolute_error” is significantly slower than when using “squared_error”."
+                },
+                "max_depth": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples."
+                },
+                "max_features": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "sqrt",
+                        "log2",
+                        "None"
+                    ],
+                    "description":"The number of features to consider when looking for the best split:\n\nIf int, then consider max_features features at each split.\n\nIf float, then max_features is a fraction, and max(1, int(max_features * n_features_in_)) features are considered at each split.\n\nIf “auto”, then max_features=n_features.\n\nIf “sqrt”, then max_features=sqrt(n_features).\n\nIf “log2”, then max_features=log2(n_features).\n\nIf None or 1.0, then max_features=n_features.\n\nNote The default of 1.0 is equivalent to bagged trees and more randomness can be achieved by setting smaller values, e.g. 0.3.\n\nNote: the search for a split does not stop until at least one valid partition of the node samples is found, even if it requires to effectively inspect more than max_features features."
+                },
+                "n_estimators": {
+                    "type": "ints array",
+                    "description":"The number of trees in the forest."
+                },
+                "min_samples_split": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float"
+                    ],
+                    "description":"The minimum number of samples required to split an internal node:\n\nIf int, then consider min_samples_split as the minimum number.\n\nIf float, then min_samples_split is a fraction, and ceil(min_samples_split * n_samples) is the minimum number of samples for each split."
+                },
+                "random_state": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"Controls both the randomness of the bootstrapping of the samples used when building trees (if bootstrap=True) and the sampling of the features to consider when looking for the best split at each node (if max_features < n_features)."
+                }
+            }
+        },
+        {
+            "id": 11,
+            "model_name": "Multilayer perceptron",
+            "task": "classification",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html",
+            "params": {
+                "tol": {
+                    "type": "ints array",
+                    "description":"Tolerance for the optimization. When the loss or score is not improving by at least tol for n_iter_no_change consecutive iterations, unless learning_rate is set to ‘adaptive’, convergence is considered to be reached and training stops."
+                },
+                "alpha": {
+                    "type": "ints array",
+                    "description":"Strength of the L2 regularization term. The L2 regularization term is divided by the sample size when added to the loss."
+                },
+                "solver": {
+                    "type": "strings array",
+                    "values": [
+                        "lbfgs",
+                        "sgd",
+                        "adam"
+                    ],
+                    "description":"The solver for weight optimization. 'lbfgs' is an optimizer in the family of quasi-Newton methods. 'sgd' refers to stochastic gradient descent. 'adam' refers to a stochastic gradient-based optimizer proposed by Kingma, Diederik, and Jimmy Ba.\n\nNote: The default solver 'adam' works well on relatively large datasets (with thousands of training samples or more) in terms of both training time and validation score. For small datasets, however, 'lbfgs' can converge faster and perform better."
+                },
+                "shuffle": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"Whether to shuffle samples in each iteration. Only used when solver=’sgd’ or ‘adam’."
+                },
+                "max_iter": {
+                    "type": "ints array",
+                    "description":"Maximum number of iterations. The solver iterates until convergence (determined by ‘tol’) or this number of iterations. For stochastic solvers (‘sgd’, ‘adam’), note that this determines the number of epochs (how many times each data point will be used), not the number of gradient steps."
+                },
+                "activation": {
+                    "type": "strings array",
+                    "values": [
+                        "identity",
+                        "logistic",
+                        "tanh",
+                        "relu"
+                    ],
+                    "description":"Name of the output activation function."
+                },
+                "random_state": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"Determines random number generation for weights and bias initialization, train-test split if early stopping is used, and batch sampling when solver=’sgd’ or ‘adam’. Pass an int for reproducible results across multiple function calls. "
+                },
+                "learning_rate": {
+                    "type": "strings array",
+                    "values": [
+                        "constant",
+                        "invscaling",
+                        "adaptive"
+                    ],
+                    "description":"Learning rate schedule for weight updates.\n\n‘constant’ is a constant learning rate given by ‘learning_rate_init’.\n\n‘invscaling’ gradually decreases the learning rate at each time step ‘t’ using an inverse scaling exponent of ‘power_t’. effective_learning_rate = learning_rate_init / pow(t, power_t)\n\n‘adaptive’ keeps the learning rate constant to ‘learning_rate_init’ as long as training loss keeps decreasing. Each time two consecutive epochs fail to decrease training loss by at least tol, or fail to increase validation score by at least tol if ‘early_stopping’ is on, the current learning rate is divided by 5."
+                },
+                "early_stopping": {
+                    "type": "booleans array",
+                    "values": [
+                        true,
+                        false
+                    ],
+                    "description":"Whether to use early stopping to terminate training when validation score is not improving. If set to true, it will automatically set aside 10% of training data as validation and terminate training when validation score is not improving by at least tol for n_iter_no_change consecutive epochs. The split is stratified, except in a multilabel setting. If early stopping is False, then the training stops when the training loss does not improve by more than tol for n_iter_no_change consecutive passes over the training set. Only effective when solver=’sgd’ or ‘adam’."
+                },
+                "hidden_layer_sizes": {
+                    "type": "ints array",
+                    "description":"The ith element represents the number of neurons in the ith hidden layer."
+                },
+                "learning_rate_init": {
+                    "type": "floats array",
+                    "description":"The initial learning rate used. It controls the step-size in updating the weights. Only used when solver=’sgd’ or ‘adam’."
+                }
+            }
+        },
+        {
+            "id": 12,
+            "model_name": "Decision Tree Regression",
+            "task": "regression",
+            "sklearn_link":"https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html",
+            "params": {
+                "splitter": {
+                    "type": "strings array",
+                    "values": [
+                        "random",
+                        "best"
+                    ],
+                    "description":"The strategy used to choose the split at each node. Supported strategies are “best” to choose the best split and “random” to choose the best random split."
+                    
+                },
+                "ccp_alpha": {
+                    "type": "floats array",
+                    "description":"Complexity parameter used for Minimal Cost-Complexity Pruning. The subtree with the largest cost complexity that is smaller than ccp_alpha will be chosen. By default, no pruning is performed. See Minimal Cost-Complexity Pruning for details."
+                },
+                "criterion": {
+                    "type": "strings array",
+                    "values": [
+                        "squared_error",
+                        "friedman_mse",
+                        "absolute_error",
+                        "poisson"
+                    ],
+                    "description":"The function to measure the quality of a split. Supported criteria are “squared_error” for the mean squared error, which is equal to variance reduction as feature selection criterion and minimizes the L2 loss using the mean of each terminal node, “friedman_mse”, which uses mean squared error with Friedman’s improvement score for potential splits, “absolute_error” for the mean absolute error, which minimizes the L1 loss using the median of each terminal node, and “poisson” which uses reduction in Poisson deviance to find splits."
+                },
+                "max_depth": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"The maximum depth of the tree. If None, then nodes are expanded until all leaves are pure or until all leaves contain less than min_samples_split samples."
+                },
+                "max_features": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "float",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "auto",
+                        "sqrt",
+                        "log2"
+                    ],
+                    "description":"The number of features to consider when looking for the best split:\n\nIf int, then consider max_features features at each split.\n\nIf float, then max_features is a fraction and max(1, int(max_features * n_features_in_)) features are considered at each split.\n\nIf “auto”, then max_features=n_features.\n\nIf “sqrt”, then max_features=sqrt(n_features).\n\nIf “log2”, then max_features=log2(n_features).\n\nIf None, then max_features=n_features.\n\nNote: the search for a split does not stop until at least one valid partition of the node samples is found, even if it requires effective inspection more than max_features features."
+                },
+                "random_state": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"Controls the randomness of the estimator. The features are always randomly permuted at each split, even if splitter is set to 'best'. When max_features < n_features, the algorithm will select max_features at random at each split before finding the best split among them. But the best found split may vary across different runs, even if max_features=n_features. That is the case, if the improvement of the criterion is identical for several splits and one split has to be selected at random. To obtain a deterministic behaviour during fitting, random_state has to be fixed to an integer."
+                },
+                "max_leaf_nodes": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"Grow a tree with max_leaf_nodes in best-first fashion. Best nodes are defined as relative reduction in impurity. If None then unlimited number of leaf nodes."
+                },
+                "min_samples_leaf": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"The minimum number of samples required to be at a leaf node. A split point at any depth will only be considered if it leaves at least min_samples_leaf training samples in each of the left and right branches. This may have the effect of smoothing the model, especially in regression.\n\nIf int, then consider min_samples_leaf as the minimum number.\n\nIf float, then min_samples_leaf is a fraction, and ceil(min_samples_leaf * n_samples) is the minimum number of samples for each node."
+                },
+                "min_samples_split": {
+                    "type": "mixed array",
+                    "possible_values": [
+                        "int",
+                        "string"
+                    ],
+                    "strings_values": [
+                        "None"
+                    ],
+                    "description":"The minimum number of samples required to split an internal node:\n\nIf int, then consider min_samples_split as the minimum number.\n\nIf float, then min_samples_split is a fraction and ceil(min_samples_split * n_samples) are the minimum number of samples for each split."
+                },
+                "min_impurity_decrease": {
+                    "type": "floats array",
+                    "description":"A node will be split if this split induces a decrease of the impurity greater than or equal to this value.\n\nThe weighted impurity decrease equation is the following:\n\nN_t / N * (impurity - N_t_R / N_t * right_impurity - N_t_L / N_t * left_impurity)\nwhere N is the total number of samples, N_t is the number of samples at the current node, N_t_L is the number of samples in the left child, and N_t_R is the number of samples in the right child.\n\nN, N_t, N_t_R, and N_t_L all refer to the weighted sum if sample_weight is passed."
+                },
+                "min_weight_fraction_leaf": {
+                    "type": "floats array",
+                    "description":"The minimum weighted fraction of the sum total of weights (of all the input samples) required to be at a leaf node. Samples have equal weight when sample_weight is not provided."
+                }
+            }
+        }
+    ]
+}

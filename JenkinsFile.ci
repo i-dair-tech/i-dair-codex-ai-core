@@ -1,0 +1,91 @@
+def incrementValue(value) {
+    return value + 1
+}
+def  version 
+
+pipeline {
+  agent any
+  environment {
+    VERSION = ''    
+    majord = 1
+    minor = 0
+  }
+  stages {
+    stage('build') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[ url: 'git@github.com:i-dair-tech/ri-codex-ai-core.git']]])  
+      }
+    }
+    stage('sonarqube') {
+      environment{
+        sonarscaner=  tool name: 'sonar'
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'sonarpass', passwordVariable: 'sonarpass', usernameVariable: 'sonaruser')]) {
+         sh '''${sonarscaner}/bin/sonar-scanner -D sonar.login=${sonaruser} -D sonar.password=${sonarpass}''' 
+        } 
+      }
+    }
+	  stage('version') {
+      steps {
+        script {
+          if (!fileExists('patchaicore.txt')) {
+                    writeFile(file: 'patchaicore.txt', text: '0')
+          }
+          def previousValue = readFile('patchaicore.txt').trim() ?: 0
+          def counter = incrementValue(previousValue.toInteger())
+          writeFile(file: 'patchaicore.txt', text: counter.toString())
+          if (!fileExists('majoraicore.txt')) {
+            writeFile(file: 'majoraicore.txt', text: '0')
+          }  
+          if (!fileExists('minoraicore.txt')) {
+            writeFile(file: 'minoraicore.txt', text: '0')
+          }
+          def next = readFile('minoraicore.txt').trim() 
+          def previ= readFile('majoraicore.txt').trim() 
+          def minornew =0 
+          if(next <  env.minor){
+            minornew = env.minor
+            previousValue = 0
+            counter = previousValue
+            writeFile(file: 'patchaicore.txt', text: counter.toString())
+          }
+          else {
+            minornew = next
+          }
+          writeFile(file: 'minoraicore.txt', text: minornew.toString())
+          def  major = 0
+          if(previ <  env.majord){
+            major = env.majord
+            previousValue = 0
+            counter = previousValue
+            writeFile(file: 'patchaicore.txt', text: counter.toString())
+          }
+          else {
+            major = previ
+          }
+          writeFile(file: 'majoraicore.txt', text: major.toString())
+          def patch = counter 
+          version = "${major}.${minornew}.${patch}"
+        }
+      }
+    }
+    stage('Release') {
+      steps {
+        withCredentials([file(credentialsId: 'cancer', variable: 'cancer')]) {
+          sh 'git branch'
+          sh ''' #! /bin/sh
+              gh auth login --with-token < ${cancer}  '''
+          echo "${version}"
+          sh """gh api  --method POST  -H "Accept: application/vnd.github+json"  /repos/i-dair-tech/ri-codex-ai-core/releases -f tag_name='v'.${version} -f target_commitish='development' -f name=='v'.${version} -f body='Description of the release' -F draft=false -F prerelease=false -F generate_release_notes=false """
+        }
+      }
+    }
+        
+  }
+  post { 
+    always { 
+      echo 'I will always say end again!'
+    }
+  }
+}

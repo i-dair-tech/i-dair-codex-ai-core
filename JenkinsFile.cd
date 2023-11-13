@@ -1,0 +1,50 @@
+def incrementValue(value) {
+    return value + 1
+}
+def  version
+pipeline {
+  agent any
+  environment {
+    VERSION = ''
+    majord = 0
+    minor = 0
+    }
+  stages {
+    stage('Docker Build') {
+      steps {
+        checkout([$class: 'GitSCM', branches: [[name: '*/prod']], extensions: [], userRemoteConfigs: [[ url: 'git@github.com:i-dair-tech/ri-codex-ai-core.git']]])   
+        withCredentials([usernamePassword(credentialsId: 'idair', passwordVariable: 'idairpass', usernameVariable: 'idairuser')])  {
+          sh 'docker logout '
+          sh 'docker login  -u ${idairuser} -p ${idairpass} '
+        }
+        script {
+          app = docker.build("windsocially/ri-codex-ai-core")
+        }
+      }
+        
+    }
+    stage('version') {
+      steps {
+        script {
+          def patch  = readFile('/var/lib/jenkins/workspace/ri-codex-ai-core.ci/patchaicore.txt').trim()
+          def major  = readFile('/var/lib/jenkins/workspace/ri-codex-ai-core.ci/majoraicore.txt').trim()
+          def minornew  = readFile('/var/lib/jenkins/workspace/ri-codex-ai-core.ci/minoraicore.txt').trim()
+          version = "${major}.${minornew}.${patch}"
+        }
+      }
+    }
+    stage('Docker push') {
+      steps {
+        script {
+          withCredentials([usernamePassword(credentialsId: 'idair', passwordVariable: 'idairpass', usernameVariable: 'idairuser')])  {
+            app.push("v.${version}")
+            app.push("latest")
+          }
+        }
+        sh "docker rmi -f windsocially/ri-codex-ai-core:v.${version}"
+        sh "docker rmi -f windsocially/ri-codex-ai-core"
+      }
+     
+    }
+  }
+}
