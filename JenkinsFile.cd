@@ -12,7 +12,7 @@ pipeline {
   stages {
     stage('Docker Build') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '*/prod']], extensions: [], userRemoteConfigs: [[ url: 'git@github.com:i-dair-tech/ri-codex-ai-core.git']]])   
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[ url: 'git@github.com:i-dair-tech/i-dair-codex-ai-core.git']]])   
         withCredentials([usernamePassword(credentialsId: 'idair', passwordVariable: 'idairpass', usernameVariable: 'idairuser')])  {
           sh 'docker logout '
           sh 'docker login  -u ${idairuser} -p ${idairpass} '
@@ -26,9 +26,9 @@ pipeline {
     stage('version') {
       steps {
         script {
-          def patch  = readFile('/var/lib/jenkins/workspace/ri-codex-ai-core.ci/patchaicore.txt').trim()
-          def major  = readFile('/var/lib/jenkins/workspace/ri-codex-ai-core.ci/majoraicore.txt').trim()
-          def minornew  = readFile('/var/lib/jenkins/workspace/ri-codex-ai-core.ci/minoraicore.txt').trim()
+          def patch  = readFile('/var/lib/jenkins/workspace/i-dair-codex-ai-core.ci/patchaicore.txt').trim()
+          def major  = readFile('/var/lib/jenkins/workspace/i-dair-codex-ai-core.ci/majoraicore.txt').trim()
+          def minornew  = readFile('/var/lib/jenkins/workspace/i-dair-codex-ai-core.ci/minoraicore.txt').trim()
           version = "${major}.${minornew}.${patch}"
         }
       }
@@ -41,8 +41,8 @@ pipeline {
             app.push("latest")
           }
         }
-        sh "docker rmi -f windsocially/ri-codex-ai-core:v.${version}"
-        sh "docker rmi -f windsocially/ri-codex-ai-core"
+        sh "docker rmi -f windsocially/i-dair-codex-ai-coree:v.${version}"
+        sh "docker rmi -f windsocially/i-dair-codex-ai-core"
       }
      
     }

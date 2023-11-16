@@ -13,7 +13,7 @@ pipeline {
   stages {
     stage('build') {
       steps {
-        checkout([$class: 'GitSCM', branches: [[name: '*/development']], extensions: [], userRemoteConfigs: [[ url: 'git@github.com:i-dair-tech/ri-codex-ai-core.git']]])  
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[ url: 'git@github.com:i-dair-tech/i-dair-codex-ai-core.git']]])  
       }
     }
     stage('sonarqube') {
@@ -77,7 +77,7 @@ pipeline {
           sh ''' #! /bin/sh
               gh auth login --with-token < ${cancer}  '''
           echo "${version}"
-          sh """gh api  --method POST  -H "Accept: application/vnd.github+json"  /repos/i-dair-tech/ri-codex-ai-core/releases -f tag_name='v'.${version} -f target_commitish='development' -f name=='v'.${version} -f body='Description of the release' -F draft=false -F prerelease=false -F generate_release_notes=false """
+          sh """gh api  --method POST  -H "Accept: application/vnd.github+json"  /repos/i-dair-tech/i-dair-codex-ai-core/releases -f tag_name='v'.${version} -f target_commitish='main' -f name=='v'.${version} -f body='Description of the release' -F draft=false -F prerelease=false -F generate_release_notes=false """
         }
       }
     }
