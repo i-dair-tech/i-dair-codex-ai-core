@@ -18,7 +18,7 @@ pipeline {
           sh 'docker login  -u ${idairuser} -p ${idairpass} '
         }
         script {
-          app = docker.build("windsocially/ri-codex-ai-core")
+          app = docker.build("windsocially/i-dair-codex-ai-core")
         }
       }
         
@@ -41,7 +41,7 @@ pipeline {
             app.push("latest")
           }
         }
-        sh "docker rmi -f windsocially/i-dair-codex-ai-coree:v.${version}"
+        sh "docker rmi -f windsocially/i-dair-codex-ai-core:v.${version}"
         sh "docker rmi -f windsocially/i-dair-codex-ai-core"
       }
      
