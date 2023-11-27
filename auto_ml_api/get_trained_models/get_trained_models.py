@@ -21,6 +21,7 @@ path = os.getcwd()
 dataset_path_prefix = os.path.dirname(path)+"/"
 
 project_path = os.path.join(path, 'tools')
+training_path = os.path.join(path,'training')
 
 sys.path.insert(0, project_path)
 
@@ -31,7 +32,7 @@ from set_mlflow_tracking_uri import set_tracking_uri
 from opentelemetry import trace
 from trace_propagation import get_context
 from trace_status_setter import status_setter
-
+from set_decimals import set_decimals
 
 def remove_downloded_files():
     csv_files=glob.glob("*.csv")
@@ -76,6 +77,18 @@ def get_trained_models(request):
                     trained_model['importance_scores'] = importance_scores
                     trained_model['plot'] = importance_fig
 
+                    mlflow.artifacts.download_artifacts(run_id=trained_model['run_id'], artifact_path="bootstrap_estimates.csv", dst_path=".")
+                    bootstrap_estimates=pd.read_csv("bootstrap_estimates.csv")
+                    grouped_df = bootstrap_estimates.groupby(['model', 'metric']).agg({
+                        'lower': 'mean',
+                        'median': 'first', 
+                        'upper': 'mean'
+                    }).reset_index()
+                    grouped_df.columns = ['model', 'metric', 'lower', 'median', 'upper']
+                    
+                    for metric in metrics :
+                        quantiles_metric_df=grouped_df[grouped_df["metric"]==metric["key"]]
+                        metric["value"]=f"{set_decimals(quantiles_metric_df['median'].to_string(index=False))}[{set_decimals(quantiles_metric_df['lower'].to_string(index=False))},{set_decimals(quantiles_metric_df['upper'].to_string(index=False))}]"
 
                 mlflow.artifacts.download_artifacts(run_id=trained_model['run_id'], artifact_path="feature_engineering_tracking.joblib", dst_path=".")
                 mlflow.artifacts.download_artifacts(run_id=trained_model['run_id'], artifact_path="param_space.joblib", dst_path=".")
@@ -172,6 +185,18 @@ def get_trained_models_by_dataset(request):
                         
                     trained_model['importance_scores'] = importance_scores
                     trained_model['plot'] = importance_fig
+                    mlflow.artifacts.download_artifacts(run_id=trained_model['run_id'], artifact_path="bootstrap_estimates.csv", dst_path=".")
+                    bootstrap_estimates=pd.read_csv("bootstrap_estimates.csv")
+                    grouped_df = bootstrap_estimates.groupby(['model', 'metric']).agg({
+                        'lower': 'mean',
+                        'median': 'first', 
+                        'upper': 'mean'
+                    }).reset_index()
+                    grouped_df.columns = ['model', 'metric', 'lower', 'median', 'upper']
+                    
+                    for metric in metrics :
+                        quantiles_metric_df=grouped_df[grouped_df["metric"]==metric["key"]]
+                        metric["value"]=f"{set_decimals(quantiles_metric_df['median'].to_string(index=False))}[{set_decimals(quantiles_metric_df['lower'].to_string(index=False))},{set_decimals(quantiles_metric_df['upper'].to_string(index=False))}]"
 
                 mlflow.artifacts.download_artifacts(run_id=trained_model['run_id'], artifact_path="feature_engineering_tracking.joblib", dst_path=".")
                 mlflow.artifacts.download_artifacts(run_id=trained_model['run_id'], artifact_path="param_space.joblib", dst_path=".")
