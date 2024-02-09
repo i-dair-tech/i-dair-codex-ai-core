@@ -14,3 +14,4 @@ bootstrap_estimates.json
 importance_fig.json
 auto_ml_api/migrations/
 logs.log
+/.idea/
